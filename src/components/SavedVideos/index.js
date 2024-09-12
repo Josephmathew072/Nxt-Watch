@@ -1,151 +1,69 @@
-import {Component} from 'react'
-import Cookies from 'js-cookie'
-import {Redirect, Link} from 'react-router-dom'
-import {HiFire} from 'react-icons/hi'
-import {formatDistanceToNow} from 'date-fns'
-import SideBar from '../SideBar'
-import ThemeContext from '../../context/ThemeContext'
-import SavedVideosContext from '../../context/SavedVideosContext'
-import {
-  MainContainer,
-  Heading,
-  IconContainer,
-  Banner,
-  VideosContainer,
-  Paragraph,
-} from './styledComponents'
+import {CgPlayListAdd} from 'react-icons/cg'
+
 import Header from '../Header'
-import './index.css'
+import NavigationBar from '../NavigationBar'
+import ThemeAndVideoContext from '../../context/ThemeAndVideoContext'
+import VideoCard from '../VideoCard'
 
-class SavedVideos extends Component {
-  renderVideosDetailsView = () => (
-    <ThemeContext.Consumer>
-      {value => {
-        const {isDarkTheme} = value
-        return (
-          <SavedVideosContext.Consumer>
-            {savedVideosContext => {
-              const {savedVideosData} = savedVideosContext
-              const noOfVideos = savedVideosData.length
+import {
+  SavedContainer,
+  SavedTitleIconContainer,
+  SavedVideoTitle,
+  SavedVideoList,
+  SavedText,
+  NoSavedVideosView,
+  NoSavedVideosImage,
+  NoSavedVideosHeading,
+  NoSavedVideosNote,
+} from './styledComponents'
 
-              if (noOfVideos > 0) {
-                return (
-                  <div className="saved-content-container">
-                    <Banner
-                      className="saved-banner-container"
-                      backgroundColor={isDarkTheme}
-                    >
-                      <IconContainer
-                        className="website-logo"
-                        backgroundColor={isDarkTheme}
-                      >
-                        <HiFire className="page-icon" />
-                      </IconContainer>
-                      <Heading
-                        className="banner-head"
-                        color={isDarkTheme ? '#ffffff' : ''}
-                      >
-                        Saved Videos
-                      </Heading>
-                    </Banner>
-                    <ul className="videos-container">
-                      {savedVideosData.map(each => {
-                        const date = each.publishedAt
-                        return (
-                          <li className="item-container" key={each.id}>
-                            <Link to={`/videos/${each.id}`}>
-                              <img
-                                src={each.thumbnailUrl}
-                                alt="video thumbnail"
-                                className="thumbnail"
-                              />
-                              <div>
-                                <Paragraph
-                                  className="title"
-                                  color={isDarkTheme ? '#ffffff' : ''}
-                                >
-                                  {each.title}
-                                </Paragraph>
-                                <p className="name">{each.channel.name}</p>
-                                <div className="count-container">
-                                  <p className="views">
-                                    {each.viewCount} views
-                                  </p>
-                                  <p className="date">
-                                    . {formatDistanceToNow(new Date(date))} ago
-                                  </p>
-                                </div>
-                              </div>
-                            </Link>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  </div>
-                )
-              }
-              return (
-                <VideosContainer
-                  className="no-videos-container"
-                  backgroundColor={isDarkTheme}
-                >
-                  <img
-                    src="https://assets.ccbp.in/frontend/react-js/nxt-watch-no-saved-videos-img.png"
-                    alt="no saved videos"
-                    className="no-video-image"
-                  />
-                  <Heading
-                    className="no-products-heading"
-                    color={isDarkTheme ? '#ffffff' : '#000000'}
-                  >
-                    No Saved videos Found
-                  </Heading>
-                  <Paragraph
-                    className="no-products-description"
-                    color={isDarkTheme ? '#ffffff' : '#000000'}
-                  >
-                    You can save your videos while watching them
-                  </Paragraph>
-                </VideosContainer>
-              )
-            }}
-          </SavedVideosContext.Consumer>
-        )
-      }}
-    </ThemeContext.Consumer>
-  )
+const SavedVideos = () => (
+  <ThemeAndVideoContext.Consumer>
+    {value => {
+      const {isDarkTheme, savedVideos} = value
+      // console.log(savedVideos)
 
-  render() {
-    const jwtToken = Cookies.get('jwt_token')
-    if (jwtToken === undefined) {
-      return <Redirect to="/login" />
-    }
+      const bgColor = isDarkTheme ? '#0f0f0f' : '#f9f9f9'
+      const textColor = isDarkTheme ? '#f9f9f9' : '#231f20'
+      const headingColor = isDarkTheme ? '#f1f5f9' : '#1e293b'
+      const noteColor = isDarkTheme ? '#e2e8f0' : '#475569'
 
-    return (
-      <>
-        <Header />
-        <ThemeContext.Consumer>
-          {value => {
-            const {isDarkTheme} = value
-            return (
-              <MainContainer
-                className="saved-container"
-                backgroundColor={isDarkTheme}
-                data-testid="savedVideos"
-              >
-                <div className="menu">
-                  <SideBar />
-                </div>
-                <div className="saved-content">
-                  {this.renderVideosDetailsView()}
-                </div>
-              </MainContainer>
-            )
-          }}
-        </ThemeContext.Consumer>
-      </>
-    )
-  }
-}
+      return (
+        <>
+          <Header />
+          <NavigationBar />
+          <SavedContainer data-testid="savedVideos" bgColor={bgColor}>
+            <SavedVideoTitle>
+              <SavedTitleIconContainer>
+                <CgPlayListAdd size={35} color="#ff0000" />
+              </SavedTitleIconContainer>
+              <SavedText color={textColor}>Saved Videos</SavedText>
+            </SavedVideoTitle>
+            {savedVideos.length > 0 ? (
+              <SavedVideoList>
+                {savedVideos.map(eachVideo => (
+                  <VideoCard key={eachVideo.id} videoDetails={eachVideo} />
+                ))}
+              </SavedVideoList>
+            ) : (
+              <NoSavedVideosView>
+                <NoSavedVideosImage
+                  src="https://assets.ccbp.in/frontend/react-js/nxt-watch-no-saved-videos-img.png"
+                  alt="no saved videos"
+                />
+                <NoSavedVideosHeading headingColor={headingColor}>
+                  No saved videos found
+                </NoSavedVideosHeading>
+                <NoSavedVideosNote noteColor={noteColor}>
+                  You can save your videos while watching them
+                </NoSavedVideosNote>
+              </NoSavedVideosView>
+            )}
+          </SavedContainer>
+        </>
+      )
+    }}
+  </ThemeAndVideoContext.Consumer>
+)
 
 export default SavedVideos

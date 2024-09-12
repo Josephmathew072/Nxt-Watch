@@ -1,87 +1,83 @@
 import {Component} from 'react'
-import {BrowserRouter, Route, Switch, Redirect} from 'react-router-dom'
+import {Route, Switch, Redirect} from 'react-router-dom'
+import ProtectedRoute from './components/ProtectedRoute'
 import LoginForm from './components/LoginForm'
 import Home from './components/Home'
-import Trending from './components/Trending'
-import Gaming from './components/Gaming'
+import VideoDetailView from './components/VideoDetailView'
+import TrendingVideos from './components/TrendingVideos'
+import GamingVideos from './components/GamingVideos'
 import SavedVideos from './components/SavedVideos'
-import VideoItemDetails from './components/VideoItemDetails'
 import NotFound from './components/NotFound'
-import ProtectedRoute from './components/ProtectedRoute'
-import ThemeContext from './context/ThemeContext'
-import SavedVideosContext from './context/SavedVideosContext'
+
+import ThemeAndVideoContext from './context/ThemeAndVideoContext'
+
 import './App.css'
 
 class App extends Component {
   state = {
+    savedVideos: [],
     isDarkTheme: false,
-    savedVideosData: [],
+    activeTab: 'Home',
   }
 
-  changeTheme = () => {
+  changeTab = tab => {
+    this.setState({activeTab: tab})
+  }
+
+  toggleTheme = () => {
     this.setState(prevState => ({
       isDarkTheme: !prevState.isDarkTheme,
     }))
   }
 
-  addVideos = data => {
-    this.setState(prevState => {
-      const videoExists = prevState.savedVideosData.some(
-        each => each.id === data.id,
-      )
-      if (videoExists) {
-        return prevState
-      }
-      return {
-        savedVideosData: [...prevState.savedVideosData, data],
-      }
-    })
+  addVideo = video => {
+    const {savedVideos} = this.state
+    const index = savedVideos.findIndex(eachVideo => eachVideo.id === video.id)
+    if (index === -1) {
+      this.setState({savedVideos: [...savedVideos, video]})
+    } else {
+      savedVideos.splice(index, 1)
+      this.setState({savedVideos})
+    }
   }
 
-  removeVideos = data => {
-    this.setState(prevState => ({
-      savedVideosData: prevState.savedVideosData.filter(
-        each => each.id !== data.id,
-      ),
-    }))
+  removeVideo = id => {
+    const {savedVideos} = this.state
+    const updatedSavedVideos = savedVideos.filter(
+      eachVideo => eachVideo.id !== id,
+    )
+    this.setState({savedVideos: updatedSavedVideos})
   }
 
   render() {
-    const {isDarkTheme, savedVideosData} = this.state
-
+    const {savedVideos, isDarkTheme, activeTab} = this.state
+    // console.log(savedVideos)
     return (
-      <ThemeContext.Provider
-        value={{isDarkTheme, changeTheme: this.changeTheme}}
+      <ThemeAndVideoContext.Provider
+        value={{
+          savedVideos,
+          isDarkTheme,
+          activeTab,
+          toggleTheme: this.toggleTheme,
+          addVideo: this.addVideo,
+          changeTab: this.changeTab,
+        }}
       >
-        <SavedVideosContext.Provider
-          value={{
-            savedVideosData,
-            addVideos: this.addVideos,
-            removeVideos: this.removeVideos,
-          }}
-        >
-          <BrowserRouter>
-            <Switch>
-              <Route exact path="/login" component={LoginForm} />
-              <ProtectedRoute exact path="/" component={Home} />
-              <ProtectedRoute exact path="/trending" component={Trending} />
-              <ProtectedRoute exact path="/gaming" component={Gaming} />
-              <ProtectedRoute
-                exact
-                path="/saved-videos"
-                component={SavedVideos}
-              />
-              <ProtectedRoute
-                exact
-                path="/videos/:id"
-                component={VideoItemDetails}
-              />
-              <Route path="/not-found" component={NotFound} />
-              <Redirect to="/not-found" />
-            </Switch>
-          </BrowserRouter>
-        </SavedVideosContext.Provider>
-      </ThemeContext.Provider>
+        <Switch>
+          <Route exact path="/login" component={LoginForm} />
+          <ProtectedRoute exact path="/" component={Home} />
+          <ProtectedRoute
+            exact
+            path="/videos/:id"
+            component={VideoDetailView}
+          />
+          <ProtectedRoute exact path="/trending" component={TrendingVideos} />
+          <ProtectedRoute exact path="/gaming" component={GamingVideos} />
+          <ProtectedRoute exact path="/saved-videos" component={SavedVideos} />
+          <Route path="/not-found" component={NotFound} />
+          <Redirect to="not-found" />
+        </Switch>
+      </ThemeAndVideoContext.Provider>
     )
   }
 }

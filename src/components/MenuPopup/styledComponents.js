@@ -9,7 +9,7 @@ const getBackgroundColor = (isDarkTheme, isSelected) => {
 
 export const MainContainer = styled.nav`
   background-color: ${props => (props.backgroundColor ? '#231f20' : '#ffffff')};
-  height: 100vh;
+  height: auto;
 `
 export const ContentContainer = styled.nav`
   background-color: ${props => (props.backgroundColor ? '#231f20' : '#ffffff')};

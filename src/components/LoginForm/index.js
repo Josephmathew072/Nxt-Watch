@@ -1,36 +1,35 @@
 import {Component} from 'react'
 import Cookies from 'js-cookie'
 import {Redirect} from 'react-router-dom'
-import ThemeContext from '../../context/ThemeContext'
 
-import {MainConatiner, FormConatiner, Label, Button} from './styledComponents'
-import './index.css'
+import {
+  AppContainer,
+  FormContainer,
+  LoginLogo,
+  InputContainer,
+  LoginButton,
+  SubmitError,
+  InputLabel,
+  UserInput,
+  CheckboxContainer,
+  Checkbox,
+  ShowPassword,
+} from './styledComponents'
 
 class LoginForm extends Component {
   state = {
     username: '',
     password: '',
+    showPassword: false,
     showSubmitError: false,
     errorMsg: '',
-    showPassword: false,
-    checked: false,
   }
 
-  onHandleChange = () => {
-    this.setState(prevState => ({
-      checked: !prevState.checked,
-    }))
+  onChangeHandler = event => {
+    this.setState({[event.target.name]: event.target.value})
   }
 
-  onChangeUsername = event => {
-    this.setState({username: event.target.value})
-  }
-
-  onChangePassword = event => {
-    this.setState({password: event.target.value})
-  }
-
-  onShowPassword = () => {
+  OnShowPassword = () => {
     this.setState(prevState => ({showPassword: !prevState.showPassword}))
   }
 
@@ -45,7 +44,6 @@ class LoginForm extends Component {
   }
 
   onSubmitFailure = errorMsg => {
-    console.log(errorMsg)
     this.setState({showSubmitError: true, errorMsg})
   }
 
@@ -67,107 +65,68 @@ class LoginForm extends Component {
     }
   }
 
-  renderPasswordField = () => {
-    const {password, showPassword} = this.state
-    return (
-      <>
-        <label className="input-label" htmlFor="password">
-          PASSWORD
-        </label>
-        <input
-          type={showPassword ? 'text' : 'password'}
-          id="password"
-          className="password-input-field"
-          value={password}
-          onChange={this.onChangePassword}
-          placeholder="Password"
-        />
-      </>
-    )
-  }
-
   renderUsernameField = () => {
     const {username} = this.state
     return (
       <>
-        <label className="input-label" htmlFor="username">
-          USERNAME
-        </label>
-        <input
+        <InputLabel htmlFor="username">USERNAME</InputLabel>
+        <UserInput
           type="text"
           id="username"
-          className="username-input-field"
           value={username}
-          onChange={this.onChangeUsername}
+          name="username"
+          onChange={this.onChangeHandler}
           placeholder="Username"
         />
       </>
     )
   }
 
+  renderPasswordField = () => {
+    const {password, showPassword} = this.state
+    const inputType = showPassword ? 'text' : 'password'
+    return (
+      <>
+        <InputLabel htmlFor="password">PASSWORD</InputLabel>
+        <UserInput
+          type={inputType}
+          id="password"
+          value={password}
+          name="password"
+          onChange={this.onChangeHandler}
+          placeholder="Password"
+        />
+        <CheckboxContainer>
+          <Checkbox
+            type="checkbox"
+            id="checkbox"
+            onChange={this.OnShowPassword}
+          />
+          <ShowPassword htmlFor="checkbox">Show Password</ShowPassword>
+        </CheckboxContainer>
+      </>
+    )
+  }
+
   render() {
-    const {showSubmitError, errorMsg, checked} = this.state
+    const {showSubmitError, errorMsg} = this.state
     const jwtToken = Cookies.get('jwt_token')
     if (jwtToken !== undefined) {
       return <Redirect to="/" />
     }
     return (
-      <ThemeContext.Consumer>
-        {value => {
-          const {isDarkTheme} = value
-          return (
-            <MainConatiner
-              className="login-form-container"
-              backgroundColor={isDarkTheme}
-            >
-              <img
-                src={
-                  isDarkTheme
-                    ? 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-dark-theme-img.png'
-                    : 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-light-theme-img.png'
-                }
-                className="login-website-logo-mobile-image"
-                alt="nxt watch logo"
-              />
-              <FormConatiner
-                className="form-container"
-                onSubmit={this.submitForm}
-                backgroundColor={isDarkTheme}
-              >
-                <img
-                  src={
-                    isDarkTheme
-                      ? 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-dark-theme-img.png'
-                      : 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-light-theme-img.png'
-                  }
-                  className="login-website-logo-desktop-image"
-                  alt="website logo"
-                />
-                <div className="input-container">
-                  {this.renderUsernameField()}
-                </div>
-                <div className="input-container">
-                  {this.renderPasswordField()}
-                </div>
-                <Label color={isDarkTheme} onClick={this.onShowPassword}>
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={this.onHandleChange}
-                  />
-                  Show Password
-                </Label>
-                <Button type="submit" className="login-button">
-                  Login
-                </Button>
-                {showSubmitError && (
-                  <p className="error-message">*{errorMsg}</p>
-                )}
-              </FormConatiner>
-            </MainConatiner>
-          )
-        }}
-      </ThemeContext.Consumer>
+      <AppContainer>
+        <FormContainer onSubmit={this.submitForm}>
+          <LoginLogo
+            src="https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-light-theme-img.png"
+            alt="website logo"
+          />
+          <InputContainer>{this.renderUsernameField()}</InputContainer>
+          <InputContainer>{this.renderPasswordField()}</InputContainer>
+          <LoginButton type="submit">Login</LoginButton>
+          {showSubmitError && <SubmitError>*{errorMsg}</SubmitError>}
+        </FormContainer>
+      </AppContainer>
     )
   }
 }

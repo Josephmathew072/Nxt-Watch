@@ -5,7 +5,8 @@ import {HiFire} from 'react-icons/hi'
 import {SiYoutubegaming} from 'react-icons/si'
 import {CgPlayListAdd} from 'react-icons/cg'
 import {IoMdClose} from 'react-icons/io'
-import ThemeContext from '../../context/ThemeContext'
+import ThemeAndVideoContext from '../../context/ThemeAndVideoContext'
+
 import {
   MainContainer,
   List,
@@ -25,7 +26,7 @@ const MenuPopup = props => {
   const {children} = props
 
   return (
-    <ThemeContext.Consumer>
+    <ThemeAndVideoContext.Consumer>
       {value => {
         const {isDarkTheme} = value
 
@@ -136,7 +137,7 @@ const MenuPopup = props => {
           </Popup>
         )
       }}
-    </ThemeContext.Consumer>
+    </ThemeAndVideoContext.Consumer>
   )
 }
 

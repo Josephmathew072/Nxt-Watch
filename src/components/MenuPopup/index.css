@@ -1,7 +1,7 @@
 .modal {
   font-size: 12px;
   width: 300px;
-  height: 100vh;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;

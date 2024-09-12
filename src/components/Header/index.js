@@ -1,102 +1,148 @@
-import {Link, withRouter} from 'react-router-dom'
+import {withRouter} from 'react-router-dom'
 import Cookies from 'js-cookie'
-import {IoIosMoon} from 'react-icons/io'
-import {FiSun, FiLogOut} from 'react-icons/fi'
+import Popup from 'reactjs-popup'
+
+import {BsMoon, BsBrightnessHigh} from 'react-icons/bs'
+import {FiLogOut} from 'react-icons/fi'
 import {IoMenu} from 'react-icons/io5'
-import LogOut from '../LogOutPopup'
 import MenuPopup from '../MenuPopup'
-import ThemeContext from '../../context/ThemeContext'
-import {NavConatiner, List} from './styledComponents'
 
-import './index.css'
+import ThemeAndVideoContext from '../../context/ThemeAndVideoContext'
 
-const Header = props => {
-  const onClickLogout = () => {
-    Cookies.remove('jwt_token')
-    const {history} = props
-    history.replace('/login')
-  }
-  return (
-    <ThemeContext.Consumer>
-      {value => {
-        const {isDarkTheme, changeTheme} = value
-        const onChangeTheme = () => {
-          changeTheme(!isDarkTheme)
-        }
-        return (
-          <NavConatiner backgroundColor={isDarkTheme} className="nav-header">
-            <div className="nav-content">
-              <Link to="/">
-                <img
-                  className="website-logo"
-                  src={
-                    isDarkTheme
-                      ? 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-dark-theme-img.png'
-                      : 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-light-theme-img.png'
-                  }
-                  alt="website logo"
-                />
-              </Link>
-              <ul className="nav-menu">
-                <li className="menu-list">
-                  <button
-                    aria-label="theme button"
-                    type="button"
-                    data-testid="theme"
-                    className="theme-button"
-                    onClick={onChangeTheme}
-                  >
-                    {isDarkTheme ? (
-                      <FiSun className="icon1" />
-                    ) : (
-                      <IoIosMoon className="icon2" />
-                    )}
-                  </button>
-                </li>
-                <li className="menu-list">
-                  <img
-                    src="https://assets.ccbp.in/frontend/react-js/nxt-watch-profile-img.png"
-                    alt="profile"
-                    className="profile-icon"
-                  />
-                </li>
-              </ul>
-              <LogOut onClickLogout={onClickLogout}>Logout</LogOut>
-              <div className="nav-menu-mobile">
-                <ul className="nav-menu-list-mobile">
-                  <li className="nav-menu-item-mobile">
-                    <button
-                      aria-label="theme button"
+import {
+  LogoLink,
+  NavbarHeader,
+  HeaderLogo,
+  ActionsContainer,
+  ThemeButton,
+  LogoutIconButton,
+  LogoutButton,
+  ProfileImage,
+  ModalContainer,
+  CloseButton,
+  ConfirmButton,
+  ModalDesc,
+  ButtonsContainer,
+  List,
+} from './styledComponents'
+
+const Header = props => (
+  <ThemeAndVideoContext.Consumer>
+    {value => {
+      const {isDarkTheme, toggleTheme} = value
+      const color = isDarkTheme ? '#ffffff' : '#00306e'
+      const bgColor = isDarkTheme ? '#231f20' : '#f1f5f9'
+
+      const onChangeTheme = () => {
+        toggleTheme()
+      }
+
+      const onClickLogout = () => {
+        const {history} = props
+        Cookies.remove('jwt_token')
+        history.replace('/login')
+      }
+
+      return (
+        <NavbarHeader bgColor={bgColor}>
+          <LogoLink to="/">
+            <HeaderLogo
+              src={
+                isDarkTheme
+                  ? 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-dark-theme-img.png'
+                  : 'https://assets.ccbp.in/frontend/react-js/nxt-watch-logo-light-theme-img.png'
+              }
+              alt="website logo"
+            />
+          </LogoLink>
+          <ActionsContainer>
+            <ThemeButton
+              type="button"
+              data-testid="theme"
+              onClick={onChangeTheme}
+            >
+              {isDarkTheme ? (
+                <BsBrightnessHigh color="#ffffff" size={25} />
+              ) : (
+                <BsMoon size={25} />
+              )}
+            </ThemeButton>
+            <ProfileImage
+              src="https://assets.ccbp.in/frontend/react-js/nxt-watch-profile-img.png"
+              alt="profile"
+            />
+            <List
+              className="nav-menu-item-mobile"
+              color={isDarkTheme ? '#ffffff' : '#231f20'}
+            >
+              <MenuPopup>
+                <IoMenu size={25} />
+              </MenuPopup>
+            </List>
+            <Popup
+              modal
+              trigger={
+                <LogoutButton type="button" bgColor={bgColor} color={color}>
+                  Logout
+                </LogoutButton>
+              }
+            >
+              {close => (
+                <ModalContainer bgColor={bgColor}>
+                  <ModalDesc color={color}>
+                    Are you sure, you want to logout?
+                  </ModalDesc>
+                  <ButtonsContainer>
+                    <CloseButton
                       type="button"
-                      data-testid="theme"
-                      className="theme-button"
-                      onClick={onChangeTheme}
+                      data-testid="closeButton"
+                      onClick={() => close()}
                     >
-                      {isDarkTheme ? (
-                        <FiSun className="icon1" />
-                      ) : (
-                        <IoIosMoon className="icon2" />
-                      )}
-                    </button>
-                  </li>
-                  <List
-                    className="nav-menu-item-mobile"
-                    color={isDarkTheme ? '#ffffff' : '#231f20'}
-                  >
-                    <MenuPopup>
-                      <IoMenu className="menu-icon" />
-                    </MenuPopup>
-                  </List>
-                </ul>
-                <LogOut onClickLogout={onClickLogout}>
-                  <FiLogOut className="logout-icon" />
-                </LogOut>
-              </div>
-            </div>
-          </NavConatiner>
-        )
-      }}
-    </ThemeContext.Consumer>
-  )
-}
+                      Cancel
+                    </CloseButton>
+
+                    <ConfirmButton type="button" onClick={onClickLogout}>
+                      Confirm
+                    </ConfirmButton>
+                  </ButtonsContainer>
+                </ModalContainer>
+              )}
+            </Popup>
+            <Popup
+              modal
+              trigger={
+                <LogoutIconButton type="button">
+                  <FiLogOut size={25} color={color} />
+                </LogoutIconButton>
+              }
+              className="popup-content"
+            >
+              {close => (
+                <ModalContainer bgColor={bgColor}>
+                  <ModalDesc color={color}>
+                    Are you sure, you want to logout?
+                  </ModalDesc>
+                  <ButtonsContainer>
+                    <CloseButton
+                      type="button"
+                      data-testid="closeButton"
+                      onClick={() => close()}
+                    >
+                      Cancel
+                    </CloseButton>
+
+                    <ConfirmButton type="button" onClick={onClickLogout}>
+                      Confirm
+                    </ConfirmButton>
+                  </ButtonsContainer>
+                </ModalContainer>
+              )}
+            </Popup>
+          </ActionsContainer>
+        </NavbarHeader>
+      )
+    }}
+  </ThemeAndVideoContext.Consumer>
+)
+
 export default withRouter(Header)
