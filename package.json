@@ -2,10 +2,7 @@
   "name": "nxt-watch",
   "private": true,
   "version": "1.0.0",
-  "engines": {
-    "node": "20.x",
-    "npm": ">=6"
-  },
+  "engines": { "node": "20.x" },
   "dependencies": {
     "@craco/craco": "6.1.1",
     "@testing-library/jest-dom": "5.11.9",
